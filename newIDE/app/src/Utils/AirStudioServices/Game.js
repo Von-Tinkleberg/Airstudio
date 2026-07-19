@@ -259,36 +259,40 @@ export const getAclsFromUserIds = (
   }));
 
 export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
-  const response = await client.get('/showcased-game');
-  const { gamesShowcaseUrl, filtersUrl } = response.data;
-  if (!gamesShowcaseUrl || !filtersUrl) {
-    throw new Error('Unexpected response from the resource endpoint.');
+  try {
+    const response = await client.get('/showcased-game');
+    const { gamesShowcaseUrl, filtersUrl } = response.data;
+    if (!gamesShowcaseUrl || !filtersUrl) {
+      throw new Error('Unexpected response from the resource endpoint.');
+    }
+
+    const responsesData = await Promise.all([
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(gamesShowcaseUrl)
+        .then(response => response.data)
+        .catch(e => e),
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(filtersUrl)
+        .then(response => response.data)
+        .catch(e => e),
+    ]);
+
+    if (responsesData.some(data => !data || data instanceof Error)) {
+      throw new Error('Unexpected response from the assets endpoints.');
+    }
+
+    const showcasedGames = responsesData[0];
+    const filters = responsesData[1];
+
+    return {
+      showcasedGames,
+      filters,
+    };
+  } catch (error) {
+    return { showcasedGames: [], filters: {} };
   }
-
-  const responsesData = await Promise.all([
-    axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(gamesShowcaseUrl)
-      .then(response => response.data)
-      .catch(e => e),
-    axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(filtersUrl)
-      .then(response => response.data)
-      .catch(e => e),
-  ]);
-
-  if (responsesData.some(data => !data || data instanceof Error)) {
-    throw new Error('Unexpected response from the assets endpoints.');
-  }
-
-  const showcasedGames = responsesData[0];
-  const filters = responsesData[1];
-
-  return {
-    showcasedGames,
-    filters,
-  };
 };
 
 export const registerGame = async (

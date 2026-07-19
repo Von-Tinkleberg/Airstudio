@@ -17,11 +17,8 @@ export type Announcement = {
 
 export interface Promotion {
   id: string;
-  /** Deprecated, should use the "by locale" attribute instead. */
   imageUrl?: string;
   imageUrlByLocale?: MessageByLocale;
-  /** Deprecated, should use the "by locale" attribute instead. */
-  mobileImageUrl?: string;
   mobileImageUrlByLocale?: MessageByLocale;
   display: 'all' | 'non-native-mobile' | 'native-mobile';
   type: 'game-template' | 'asset-pack' | 'game' | 'other';
@@ -32,21 +29,29 @@ export interface Promotion {
 }
 
 export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${AirStudioReleaseApi.baseUrl}/announcement`
-  );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/announcement of Release API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${AirStudioReleaseApi.baseUrl}/announcement`
+    );
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/announcement of Release API',
+    });
+  } catch (error) {
+    return [];
+  }
 };
 
 export const listAllPromotions = async (): Promise<Array<Promotion>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(`${AirStudioReleaseApi.baseUrl}/promotion`);
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/promotion of Release API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(`${AirStudioReleaseApi.baseUrl}/promotion`);
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/promotion of Release API',
+    });
+  } catch (error) {
+    return [];
+  }
 };

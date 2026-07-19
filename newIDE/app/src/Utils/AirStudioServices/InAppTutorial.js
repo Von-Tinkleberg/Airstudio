@@ -161,24 +161,33 @@ export type InAppTutorial = {|
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${AirStudioAssetApi.baseUrl}/in-app-tutorial-short-header`
-  );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/in-app-tutorial-short-header of Asset API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${AirStudioAssetApi.baseUrl}/in-app-tutorial-short-header`
+    );
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/in-app-tutorial-short-header of Asset API',
+    });
+  } catch (error) {
+    console.info('No in-app tutorial API available — offline mode.');
+    return [];
+  }
 };
 
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(shortHeader.contentUrl);
-  return ensureObjectHasProperty({
-    data: response.data,
-    propertyName: 'id',
-    endpointName: 'in-app-tutorial contentUrl of Asset API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(shortHeader.contentUrl);
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'id',
+      endpointName: 'in-app-tutorial contentUrl of Asset API',
+    });
+  } catch (error) {
+    throw new Error('Not available offline');
+  }
 };

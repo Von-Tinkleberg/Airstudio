@@ -216,65 +216,70 @@ export const client: Axios = axios.create({
 export const cdnClient: Axios = axios.create();
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
-  const response = await client.get(`/extension`, {
-    params: {
-      // Could be changed according to the editor environment, but keep
-      // reading from the "live" data for now.
-      environment: 'live',
-    },
-  });
-  const { databaseUrl } = response.data;
+  try {
+    const response = await client.get(`/extension`, {
+      params: { environment: 'live' },
+    });
+    const { databaseUrl } = response.data;
 
-  const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
-    { times: 2 },
-    async () => (await cdnClient.get(databaseUrl)).data
-  );
+    const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
+      { times: 2 },
+      async () => (await cdnClient.get(databaseUrl)).data
+    );
 
-  if (!extensionsRegistry) {
-    throw new Error('Unexpected response from the extensions endpoint.');
-  }
-  if (!extensionsRegistry.headers) {
-    extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
-  }
-  if (!extensionsRegistry.views.default.firstIds) {
-    extensionsRegistry.views.default.firstIds =
-      extensionsRegistry.views.default.firstExtensionIds;
-  }
-  for (const header of extensionsRegistry.headers) {
-    if ((header.tier: string) === 'community') {
-      header.tier = 'experimental';
+    if (!extensionsRegistry) {
+      throw new Error('Unexpected response from the extensions endpoint.');
     }
+    if (!extensionsRegistry.headers) {
+      extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
+    }
+    if (!extensionsRegistry.views.default.firstIds) {
+      extensionsRegistry.views.default.firstIds =
+        extensionsRegistry.views.default.firstExtensionIds;
+    }
+    for (const header of extensionsRegistry.headers) {
+      if ((header.tier: string) === 'community') {
+        header.tier = 'experimental';
+      }
+    }
+    return {
+      ...extensionsRegistry,
+      // $FlowFixMe[incompatible-type]
+      headers: extensionsRegistry.headers.map(transformTagsAsStringToTagsAsArray),
+    };
+  } catch (error) {
+    console.info('No extension registry API available — offline mode.');
+    return {
+      headers: [],
+      tags: [],
+      views: { default: { firstIds: [], firstExtensionIds: [] } },
+    };
   }
-  return {
-    ...extensionsRegistry,
-    // TODO: move this to backend endpoint
-    // $FlowFixMe[incompatible-type]
-    headers: extensionsRegistry.headers.map(transformTagsAsStringToTagsAsArray),
-  };
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
-  const response = await client.get(`/behavior`, {
-    params: {
-      // Could be changed according to the editor environment, but keep
-      // reading from the "live" data for now.
-      environment: 'live',
-    },
-  });
-  const { databaseUrl } = response.data;
+  try {
+    const response = await client.get(`/behavior`, {
+      params: { environment: 'live' },
+    });
+    const { databaseUrl } = response.data;
 
-  const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
-    { times: 2 },
-    async () => (await cdnClient.get(databaseUrl)).data
-  );
+    const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
+      { times: 2 },
+      async () => (await cdnClient.get(databaseUrl)).data
+    );
 
-  if (!behaviorsRegistry) {
-    throw new Error('Unexpected response from the behaviors endpoint.');
+    if (!behaviorsRegistry) {
+      throw new Error('Unexpected response from the behaviors endpoint.');
+    }
+    return {
+      ...behaviorsRegistry,
+      headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
+    };
+  } catch (error) {
+    console.info('No behavior registry API available — offline mode.');
+    return { headers: [], tags: [], views: { default: { firstIds: [] } } };
   }
-  return {
-    ...behaviorsRegistry,
-    headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
-  };
 };
 
 const adaptBehaviorHeader = (

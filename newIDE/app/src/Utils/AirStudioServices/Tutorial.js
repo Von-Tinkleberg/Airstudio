@@ -78,7 +78,11 @@ export const listAllTutorials = (): Promise<Array<Tutorial>> => {
         data: response.data,
         endpointName: '/tutorial of Asset API',
       })
-    );
+    )
+    .catch(error => {
+      console.info('No tutorial API available — offline mode.');
+      return [];
+    });
 };
 
 export const getObjectTutorialIds = (type: string): Array<string> => {

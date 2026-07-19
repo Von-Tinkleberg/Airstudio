@@ -35,57 +35,59 @@ export type AllExamples = {|
 |};
 
 export const listAllExamples = async (): Promise<AllExamples> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(`${AirStudioAssetApi.baseUrl}/example`, {
-    params: {
-      // Could be changed according to the editor environment, but keep
-      // reading from the "live" data for now.
-      environment: 'live',
-    },
-  });
-  const { exampleShortHeadersUrl, filtersUrl } = response.data;
-
-  const [exampleShortHeaders, filters] = await Promise.all([
-    retryIfFailed(
-      { times: 2 },
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      async () => (await axios.get(exampleShortHeadersUrl)).data
-    ),
+  try {
     // $FlowFixMe[underconstrained-implicit-instantiation]
-    retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
-  ]);
+    const response = await axios.get(`${AirStudioAssetApi.baseUrl}/example`, {
+      params: {
+        environment: 'live',
+      },
+    });
+    const { exampleShortHeadersUrl, filtersUrl } = response.data;
 
-  const allExamples: AllExamples = {
-    exampleShortHeaders,
-    filters,
-  };
+    const [exampleShortHeaders, filters] = await Promise.all([
+      retryIfFailed(
+        { times: 2 },
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        async () => (await axios.get(exampleShortHeadersUrl)).data
+      ),
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
+    ]);
 
-  return allExamples;
+    return { exampleShortHeaders, filters };
+  } catch (error) {
+    console.info('No example API available — running in offline mode.');
+    return { exampleShortHeaders: [], filters: {} };
+  }
 };
 
 export const getExample = async (
   exampleShortHeader: ExampleShortHeader
 ): Promise<Example> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${AirStudioAssetApi.baseUrl}/example-v2/${exampleShortHeader.id}`
-  );
-
-  return response.data;
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${AirStudioAssetApi.baseUrl}/example-v2/${exampleShortHeader.id}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error('Not available offline');
+  }
 };
 
 export const getUserExampleShortHeaders = async (
   authorId: string
 ): Promise<Array<ExampleShortHeader>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${AirStudioAssetApi.baseUrl}/example-short-header`,
-    {
-      params: {
-        authorId,
-      },
-    }
-  );
-
-  return response.data;
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${AirStudioAssetApi.baseUrl}/example-short-header`,
+      {
+        params: { authorId },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    return [];
+  }
 };
