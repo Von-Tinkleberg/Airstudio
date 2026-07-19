@@ -10,16 +10,20 @@ export type Release = {
 };
 
 export const getReleases = async (): Promise<Array<Release>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(`${AirStudioReleaseApi.baseUrl}/release`, {
-    params: {
-      last: 4,
-    },
-  });
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/release of Release API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(`${AirStudioReleaseApi.baseUrl}/release`, {
+      params: {
+        last: 4,
+      },
+    });
+    return ensureIsArray({
+      data: response.data,
+      endpointName: '/release of Release API',
+    });
+  } catch (error) {
+    return [];
+  }
 };
 
 export const hasBreakingChange = (release: Release): boolean => {
