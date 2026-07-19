@@ -1,0 +1,45 @@
+{
+  "short_name": "AirStudio",
+  "name": "AirStudio",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide-1.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "AirStudio"
+    },
+    {
+      "src": "screenshot-wide-2.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "AirStudio"
+    },
+    {
+      "src": "screenshot-wide-3.png",
+      "sizes": "3024x1890",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "AirStudio"
+    }
+  ],
+  "description": "AirStudio - Web-based game engine for creating 2D, 3D and multiplayer games. Embeddable iframe editor for your web app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e"
+}

@@ -1,0 +1,60 @@
+// @flow
+import { t } from '@lingui/macro';
+
+export default {
+  name: 'AsyncMultiplayerBehavior',
+  description: t`Async Multiplayer Behavior - Add to a scene object to enable turn-based multiplayer`,
+  fullDescription: t`Add this behavior to an object (or the scene) to enable asynchronous turn-based multiplayer. Turns are sent to the parent app which handles Supabase Realtime sync.`,
+  icon: 'turn-right',
+  behaviorType: 'behavior',
+  behaviorId: 'AsyncMultiplayerBehavior',
+  author: 'AirStudio Team',
+  license: 'MIT',
+  version: '1.0.0',
+  minAirStudioVersion: '5.4.0',
+  properties: [
+    {
+      name: 'gameId',
+      label: t`Game ID`,
+      description: t`Unique identifier for this multiplayer game session`,
+      type: 'STRING',
+      defaultValue: '',
+      group: t`Multiplayer Setup`,
+    },
+    {
+      name: 'playerId',
+      label: t`Player ID`,
+      description: t`Unique ID for this player (from your auth system)`,
+      type: 'STRING',
+      defaultValue: '',
+      group: t`Multiplayer Setup`,
+    },
+    {
+      name: 'turnTimeout',
+      label: t`Turn Timeout (seconds)`,
+      description: t`Seconds before turn auto-forfeits (0 = no timeout)`,
+      type: 'NUMBER',
+      defaultValue: 0,
+      group: t`Turn Settings`,
+    },
+    {
+      name: 'maxPlayers',
+      label: t`Max Players`,
+      description: t`Maximum number of players in this game (2-8)`,
+      type: 'NUMBER',
+      defaultValue: 2,
+      min: 2,
+      max: 8,
+      group: t`Turn Settings`,
+    },
+    {
+      name: 'sendOnTurnEnd',
+      label: t`Auto-send Turn Data`,
+      description: t`Automatically send turn data when "End Turn" action is used`,
+      type: 'BOOLEAN',
+      defaultValue: true,
+      group: t`Turn Settings`,
+    },
+  ],
+  strBehaviorsSharedDataName: 'asyncMultiplayer',
+};
