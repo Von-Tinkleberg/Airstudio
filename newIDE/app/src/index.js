@@ -73,15 +73,15 @@ class Bootstrapper extends Component<{}, State> {
       `./libGD.js?cache-buster=${VersionMetadata.versionWithHash}`
     ).then(() => {
       GD_STARTUP_TIMES.push(['libGDLoadedTime', performance.now()]);
-      const initializeAirStudioJs = global.initializeAirStudioJs;
-      if (!initializeAirStudioJs) {
+      const initializeGDevelopJs = global.initializeGDevelopJs;
+      if (!initializeGDevelopJs) {
         this.handleEditorLoadError(
-          new Error('Missing initializeAirStudioJs in libGD.js')
+          new Error('Missing initializeGDevelopJs in libGD.js')
         );
         return;
       }
 
-      initializeAirStudioJs({
+      initializeGDevelopJs({
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path: string, prefix: string) => {
