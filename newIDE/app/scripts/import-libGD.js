@@ -152,49 +152,20 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     }
   };
 
-  const branch = getBranchFromGitRef('HEAD');
-
-  // Try to download the latest libGD.js, fallback to previous or master ones
-  // if not found (including different parents, for handling of merge commits).
-  downloadCommitLibGdJs(branch, 'HEAD').then(onLibGdJsDownloaded, () => {
-    // Force the exact version of GDevelop.js to be downloaded for AppVeyor - because
-    // this means we build the app and we don't want to risk mismatch (Core C++ not up to date
-    // with the IDE JavaScript).
-    if (process.env.APPVEYOR || process.env.REQUIRES_EXACT_LIBGD_JS_VERSION) {
+  // Try master/latest directly — works for all forks and mirrors.
+  downloadBranchLatestLibGdJs('master').then(onLibGdJsDownloaded, () => {
+    if (alreadyHasLibGdJs) {
       shell.echo(
-        `❌ Can't download the exact required version of libGD.js - check it was built by CircleCI before running this CI.`
+        `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
       );
+      shell.exit(0);
+      return;
+    } else {
       shell.echo(
-        `ℹ️ See the pipeline on https://app.circleci.com/pipelines/github/4ian/GDevelop.`
+        `❌ Can't download any version of libGD.js, please check your internet connection.`
       );
       shell.exit(1);
+      return;
     }
-
-    downloadCommitLibGdJs(branch, 'HEAD~1').then(onLibGdJsDownloaded, () =>
-      downloadCommitLibGdJs(branch, 'HEAD~2').then(onLibGdJsDownloaded, () =>
-        downloadCommitLibGdJs(branch, 'HEAD~3').then(onLibGdJsDownloaded, () =>
-          downloadBranchLatestLibGdJs(branch).then(onLibGdJsDownloaded, () =>
-            downloadBranchLatestLibGdJs('master').then(
-              onLibGdJsDownloaded,
-              () => {
-                if (alreadyHasLibGdJs) {
-                  shell.echo(
-                    `ℹ️ Can't download any version of libGD.js, assuming you can go ahead with the existing one.`
-                  );
-                  shell.exit(0);
-                  return;
-                } else {
-                  shell.echo(
-                    `❌ Can't download any version of libGD.js, please check your internet connection.`
-                  );
-                  shell.exit(1);
-                  return;
-                }
-              }
-            )
-          )
-        )
-      )
-    );
   });
 }
