@@ -380,11 +380,7 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: ((typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'AirStudio default Dark'
-      : // TODO: Use the light theme back when it's adapted to the modern theme.
-        'AirStudio default Dark'): string),
+    themeName: 'AirStudio Light Blue',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
