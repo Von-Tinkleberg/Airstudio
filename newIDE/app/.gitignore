@@ -20,9 +20,6 @@ build
 .env.local
 npm-debug.log
 
-# GD library
-public/libGD.js
-public/libGD.wasm
 
 # Third party editors
 public/external/piskel/piskel-editor
